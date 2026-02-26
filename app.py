@@ -42,7 +42,7 @@ def index():
     return render_template('index.html')
 
 # Configure Gemini API key
-api_key = os.getenv("GEMINI_API_KEY", "AIzaSyBUu9Lcyk4G7Syu981eaiQAluHztTjS3mQ")
+api_key = os.getenv("GEMINI_API_KEY", "YOUR_API_KEY_HERE")
 genai.configure(api_key=api_key)
 
 
