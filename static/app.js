@@ -5,8 +5,10 @@ document.getElementById('resumeForm').addEventListener('submit', function (e) {
     const resultSection = document.getElementById('results');
 
     // Show loading state
-    progressBar.style.display = 'block';
-    resultSection.style.display = 'none';
+    progressBar.classList.remove('hidden');
+    // Ensure results remain hidden during processing
+    resultSection.classList.add('hidden');
+    resultSection.classList.remove('flex');
 
     const formData = new FormData(this);
     console.log('Form data:', formData); // Debug log
@@ -25,10 +27,11 @@ document.getElementById('resumeForm').addEventListener('submit', function (e) {
             console.log('Received data:', data); // Debug log
 
             // Hide progress bar
-            progressBar.style.display = 'none';
+            progressBar.classList.add('hidden');
 
             // Show results panel
-            resultSection.style.display = 'block';
+            resultSection.classList.remove('hidden');
+            resultSection.classList.add('flex');
 
             // Display extracted skills
             const skillsList = document.getElementById('skillsList');
@@ -38,8 +41,8 @@ document.getElementById('resumeForm').addEventListener('submit', function (e) {
                 data.skills.forEach(skill => {
                     if (skill && skill.trim()) {
                         const badge = document.createElement('span');
-                        badge.className = 'inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium';
-                        badge.textContent = skill.trim();
+                        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-100 shadow-sm';
+                        badge.innerHTML = `<svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${skill.trim()}`;
                         skillsList.appendChild(badge);
                     }
                 });
@@ -48,12 +51,12 @@ document.getElementById('resumeForm').addEventListener('submit', function (e) {
             }
 
             const resumePreview = document.getElementById('resumePreview');
-            resumePreview.style.display = 'block';
+            resumePreview.classList.remove('hidden');
 
             const resumeIframe = document.getElementById('resumeIframe');
             resumeIframe.src = URL.createObjectURL(formData.get('resume'));
-            resumeIframe.style.display = 'block';
-            document.getElementById('noResumeMessage').style.display = 'none';
+            resumeIframe.classList.remove('hidden');
+            document.getElementById('noResumeMessage').classList.add('hidden');
 
             // Display job recommendations
             const jobList = document.getElementById('jobList');
@@ -62,7 +65,7 @@ document.getElementById('resumeForm').addEventListener('submit', function (e) {
             if (data.job_recommendations && data.job_recommendations.length > 0) {
                 data.job_recommendations.forEach(job => {
                     const jobCard = document.createElement('div');
-                    jobCard.className = 'bg-white rounded-lg shadow-md p-6 mb-4';
+                    jobCard.className = 'bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group';
 
                     // Safely handle recommended courses
                     const coursesList = (job.recommended_courses || []).map(course => {
@@ -87,9 +90,9 @@ document.getElementById('resumeForm').addEventListener('submit', function (e) {
                             <h3 class="text-xl font-bold text-gray-900">${job.title || 'Position Available'}</h3>
                             <p class="text-gray-600">${job.company || 'Company Not Listed'}</p>
                         </div>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${job.score >= 0.7 ? 'bg-green-100 text-green-800' :
-                            job.score >= 0.4 ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-red-100 text-red-800'
+                        <span class="inline-flex items-center px-3 py-1 rounded-xl text-sm font-bold shadow-sm ${job.score >= 0.7 ? 'bg-green-50 text-green-700 border border-green-200' :
+                            job.score >= 0.4 ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' :
+                                'bg-red-50 text-red-700 border border-red-200'
                         }">
                             ${((job.score || 0) * 100).toFixed(0)}% Match
                         </span>
@@ -112,7 +115,8 @@ document.getElementById('resumeForm').addEventListener('submit', function (e) {
                             <h4 class="font-semibold text-gray-900 mb-2">Missing Skills</h4>
                             <div class="flex flex-wrap gap-2">
                                 ${job.missing_skills.map(skill => `
-                                    <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-red-50 text-red-700 border border-red-100">
+                                        <svg class="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                         ${skill}
                                     </span>
                                 `).join('')}
@@ -161,8 +165,9 @@ document.getElementById('resumeForm').addEventListener('submit', function (e) {
                     // Ensure the cleaned tip is not empty
                     if (cleanedTip) {
                         const tipItem = document.createElement('li');
-                        tipItem.className = 'text-gray-800 mb-2 p-2 bg-gray-50 rounded shadow-sm';  // Added Tailwind styling
-                        tipItem.textContent = cleanedTip;
+                        tipItem.className = 'flex items-start gap-3 bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10 shadow-sm';
+                        tipItem.innerHTML = `<svg class="w-6 h-6 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                             <span class="leading-relaxed">${cleanedTip}</span>`;
                         optimizationTipsList.appendChild(tipItem);
                     }
                 });
@@ -173,11 +178,13 @@ document.getElementById('resumeForm').addEventListener('submit', function (e) {
         })
         .catch(error => {
             console.error('Error:', error);
-            progressBar.style.display = 'none';
-            resultSection.style.display = 'block';
+            progressBar.classList.add('hidden');
+            resultSection.classList.remove('hidden');
+            resultSection.classList.add('flex');
             resultSection.innerHTML = `
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                <strong>Error:</strong> Failed to process resume. Please try again.
+            <div class="w-full bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl shadow-sm flex items-center gap-3">
+                <svg class="w-6 h-6 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <strong>Error:</strong> Failed to process resume or AI Rate Limit was reached. Please try again in 10 seconds.
             </div>
         `;
         });
